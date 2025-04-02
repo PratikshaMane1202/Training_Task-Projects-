@@ -1,0 +1,116 @@
+name:Pratiksha Mane
+employee ID:2000147781
+Training: Batch4 ,Mumbai branch
+
+create database petpals3;
+use petpals3;
+
+create table pets( petid int primary key, name varchar(200) not null ,
+age int not null,
+breed varchar(200) not null,
+typeofpet varchar(200)not null,
+availableforadoption bit not null);
+
+create table shelters(shelterid int primary key,
+name varchar(200) not null ,
+address varchar(250)not null);
+
+create table donations1(donationid int primary key,
+donar_name varchar(250) not null ,
+donation_type varchar(250) not null,
+shelterid int,
+donation_amount decimal(10,2),
+donation_item varchar(100),
+donation_date datetime,
+foreign key(shelterid) references shelters(shelterid) on delete cascade);
+
+create table adoption_event(eventid int primary key,
+event_name varchar(200),
+event_date datetime ,
+location varchar(255));
+
+create table participants(participantid int primary key,
+p_name varchar(100),
+p_type varchar(50),
+eventid int,
+foreign key(eventid) references adoption_event(eventid) on delete cascade);
+
+insert into pets values('1','buddy','2','golden retriver','dog',1);
+insert into pets values('2','Whiskers','3','siamese','cat',1);
+insert into pets values('3','max','5','labrodor','dog',0);
+
+insert into shelters values('1','happy tails shelter','new york');
+insert into shelters values('2','paw heaven','los angeles');
+
+insert into donations1 values('1','Alice johnson','cash','1','500.00',null,'2024-03-15 10:00:00');
+insert into donations1 values('2','Bob smith','item','2',null,'dog food','2024-04-01 14:30:00');
+
+
+insert into adoption_event values('1','spring adoption drive','2024-05-10 12:00:00','new york');
+insert into adoption_event values('2','pet carnival','2024-06-20 15:00:00','los angeles');
+insert into adoption_event values('3','pet carnival','2024-10-20 14:00:00','paris');
+
+insert into participants values('1','happy tails shelter','shelter','1');
+insert into participants values('2','john doe','adopter','1');
+insert into participants values('3','john sigh','adopter','1');
+insert into participants values('4','john patil','shelter','2');
+#5
+select name,age,breed,typeofpet from pets where availableforadoption=1;
+
+#6 Retriving particiapnts of an adoption
+select p.p_name,p.p_type from participants p join 
+adoption_event a on p.eventid=a.eventid 
+where a.eventid=1;
+
+#7 updating shelter information
+
+
+
+#8 Total donations amount per shelter
+select s.name,sum(donation_amount) as total_donation from 
+ shelters s join donations1 d on s.shelterid=d.shelterid 
+ group by s.name;
+ 
+#9
+select * from pets where availableforadoption=0; 
+
+
+#10 total donationations per month-year
+select date_format(donation_date,'%M%Y')as monthyear coalesce(sum(donation_amount),0) as total from
+donations1 group by monthyear;
+
+
+#11 Distinct breeds for pets(1-3 or older than 5)
+select distinct breed from pets where (age between 1 and 3) or (age >5);
+
+#12 pets and their shelters available for adption
+select p.name as petname ,s.name as shelter_name from pets p join shelters s on p.availableforadoption=1;
+
+#13 total participants in a specific city event
+select count(p.participantid)as total_participants from participants p 
+join adoption_event a on a.eventid=p.eventid 
+where a.location='new york';
+
+#14 retriving breed between 1 and 5 years
+select distinct breed from pets where age between 1 and 5; 
+
+#15 pets not adopted
+select * from pets where availableforadoption=0; 
+
+#16 adopted pets nad their adopters
+select p.p_name as petname,pp.p_name as adopters from pets 
+join participants pp on p.petid=pp.petid where pp.p_type='f'
+
+
+#17 count of available pets per shelter
+select s.name as shelter_name , count(p.petid) as availablepets from shelters s left join pets p on p.sehlterid
+
+#18 
+select p1.name as pet1 ,p2.name as pet2 ,p1.breed from pets p1 join pets p2 on p1.shelterid= p2.shelterid and p1.breed= p2.breed and p1.petid < p2.petid;
+
+
+#19
+select s.name as sheltername ,e.event_name from shelters s, adoption_event e;
+
+#20 
+select s.name ,count(*) from shelters s join pets p on s.petid=p.petid group by name;
